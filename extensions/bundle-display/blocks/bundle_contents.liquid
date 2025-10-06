@@ -1,0 +1,177 @@
+{% comment %}
+  Bundle Contents Display Block
+  Shows "What's included" section for product bundles
+{% endcomment %}
+
+{% assign bundle_config = block.settings.product.metafields.custom.bundle_config.value %}
+
+{% if bundle_config.isBundle and bundle_config.products.size > 0 %}
+  <div class="bundle-contents" style="
+    border: 1px solid {{ block.settings.border_color }};
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    background-color: {{ block.settings.background_color }};
+  ">
+    <h3 style="
+      margin-top: 0;
+      margin-bottom: 16px;
+      font-size: {{ block.settings.title_size }}px;
+      color: {{ block.settings.title_color }};
+    ">
+      {{ block.settings.title }}
+    </h3>
+
+    <ul style="
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    ">
+      {% for bundle_product in bundle_config.products %}
+        <li style="
+          display: flex;
+          align-items: center;
+          padding: 12px 0;
+          border-bottom: 1px solid {{ block.settings.divider_color }};
+        ">
+          <span style="
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: {{ block.settings.quantity_bg_color }};
+            color: {{ block.settings.quantity_text_color }};
+            font-weight: bold;
+            margin-right: 12px;
+            flex-shrink: 0;
+          ">
+            {{ bundle_product.quantity }}×
+          </span>
+
+          <span style="
+            flex-grow: 1;
+            color: {{ block.settings.text_color }};
+            font-size: {{ block.settings.text_size }}px;
+          ">
+            {% if bundle_product.title %}
+              {{ bundle_product.title }}
+            {% else %}
+              {{ bundle_product.productId | split: '/' | last }}
+            {% endif %}
+          </span>
+        </li>
+      {% endfor %}
+    </ul>
+
+    {% if block.settings.show_total_items %}
+      <div style="
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 2px solid {{ block.settings.divider_color }};
+        font-weight: bold;
+        color: {{ block.settings.text_color }};
+      ">
+        {% assign total_items = 0 %}
+        {% for bundle_product in bundle_config.products %}
+          {% assign total_items = total_items | plus: bundle_product.quantity %}
+        {% endfor %}
+        Total: {{ total_items }} items in this bundle
+      </div>
+    {% endif %}
+  </div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Bundle Contents",
+  "target": "section",
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Product",
+      "autofill": true
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "What's Included"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 14,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "label": "Title Size",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Text Size",
+      "default": 16
+    },
+    {
+      "type": "checkbox",
+      "id": "show_total_items",
+      "label": "Show Total Item Count",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#f9fafb"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#e5e7eb"
+    },
+    {
+      "type": "color",
+      "id": "divider_color",
+      "label": "Divider Color",
+      "default": "#e5e7eb"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title Color",
+      "default": "#111827"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#374151"
+    },
+    {
+      "type": "color",
+      "id": "quantity_bg_color",
+      "label": "Quantity Badge Background",
+      "default": "#3b82f6"
+    },
+    {
+      "type": "color",
+      "id": "quantity_text_color",
+      "label": "Quantity Badge Text",
+      "default": "#ffffff"
+    }
+  ]
+}
+{% endschema %}

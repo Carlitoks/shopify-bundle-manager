@@ -1,0 +1,13 @@
+{
+  "bundle": {
+    "contents": {
+      "title": "What's Included",
+      "total_items": "Total: {count} items in this bundle"
+    },
+    "availability": {
+      "in_stock": "Bundle Available",
+      "out_of_stock": "Bundle Currently Unavailable",
+      "quantity": "{count} bundles available"
+    }
+  }
+}

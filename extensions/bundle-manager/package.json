@@ -1,0 +1,20 @@
+{
+  "name": "bundle-manager",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "shopify app build",
+    "dev": "shopify app dev"
+  },
+  "dependencies": {
+    "@shopify/ui-extensions": "2025.7.1",
+    "@shopify/ui-extensions-react": "2025.7.1",
+    "react": "^18.3.1",
+    "react-reconciler": "^0.29.2"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.1",
+    "typescript": "^5.0.0"
+  }
+}
