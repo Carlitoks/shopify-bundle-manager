@@ -1,0 +1,138 @@
+{% comment %}
+  Bundle Availability Display Block
+  Shows stock availability for bundles based on component inventory
+{% endcomment %}
+
+{% assign bundle_config = block.settings.product.metafields.custom.bundle_config.value %}
+
+{% if bundle_config.isBundle and bundle_config.products.size > 0 %}
+  {% comment %}
+    Show bundle availability based on the main product's availability
+    Note: In Phase 2, this will be enhanced with component inventory checking
+  {% endcomment %}
+
+  <div class="bundle-availability" style="
+    border: 1px solid {{ block.settings.border_color }};
+    border-radius: 8px;
+    padding: 16px;
+    margin: 20px 0;
+    background-color: {{ block.settings.background_color }};
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  ">
+    {% if block.settings.product.available %}
+      <svg style="flex-shrink: 0; color: {{ block.settings.in_stock_color }};" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10"></circle>
+        <path d="M9 12l2 2 4-4"></path>
+      </svg>
+      <div>
+        <div style="
+          font-weight: bold;
+          color: {{ block.settings.in_stock_color }};
+          font-size: {{ block.settings.text_size }}px;
+        ">
+          {{ block.settings.in_stock_text }}
+        </div>
+        {% if block.settings.show_quantity and block.settings.product.selected_or_first_available_variant.inventory_quantity > 0 %}
+          <div style="
+            font-size: {{ block.settings.text_size | minus: 2 }}px;
+            color: {{ block.settings.text_color }};
+            margin-top: 4px;
+          ">
+            {{ block.settings.product.selected_or_first_available_variant.inventory_quantity }} bundles available
+          </div>
+        {% endif %}
+      </div>
+    {% else %}
+      <svg style="flex-shrink: 0; color: {{ block.settings.out_of_stock_color }};" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10"></circle>
+        <path d="M15 9l-6 6M9 9l6 6"></path>
+      </svg>
+      <div style="
+        font-weight: bold;
+        color: {{ block.settings.out_of_stock_color }};
+        font-size: {{ block.settings.text_size }}px;
+      ">
+        {{ block.settings.out_of_stock_text }}
+      </div>
+    {% endif %}
+  </div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Bundle Availability",
+  "target": "section",
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Product",
+      "autofill": true
+    },
+    {
+      "type": "text",
+      "id": "in_stock_text",
+      "label": "In Stock Text",
+      "default": "Bundle Available"
+    },
+    {
+      "type": "text",
+      "id": "out_of_stock_text",
+      "label": "Out of Stock Text",
+      "default": "Bundle Currently Unavailable"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quantity",
+      "label": "Show Available Quantity",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Text Size",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#f0fdf4"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#86efac"
+    },
+    {
+      "type": "color",
+      "id": "in_stock_color",
+      "label": "In Stock Color",
+      "default": "#16a34a"
+    },
+    {
+      "type": "color",
+      "id": "out_of_stock_color",
+      "label": "Out of Stock Color",
+      "default": "#dc2626"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Secondary Text Color",
+      "default": "#6b7280"
+    }
+  ]
+}
+{% endschema %}

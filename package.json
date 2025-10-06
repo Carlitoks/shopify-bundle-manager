@@ -1,0 +1,27 @@
+{
+  "name": "test-store-bundles-store",
+  "version": "1.0.0",
+  "license": "UNLICENSED",
+  "scripts": {
+    "shopify": "shopify",
+    "build": "shopify app build",
+    "dev": "shopify app dev",
+    "dev:webhooks": "cd web && npm run dev",
+    "dev:full": "concurrently \"npm:dev:webhooks\" \"npm:dev\" --names \"webhooks,shopify\" --prefix-colors \"cyan,magenta\"",
+    "info": "shopify app info",
+    "generate": "shopify app generate",
+    "deploy": "shopify app deploy"
+  },
+  "trustedDependencies": [
+    "@shopify/plugin-cloudflare"
+  ],
+  "author": "carlitoks",
+  "private": true,
+  "workspaces": [
+    "extensions/*",
+    "web"
+  ],
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

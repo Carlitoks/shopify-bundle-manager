@@ -1,0 +1,14 @@
+# Learn more about configuring your extension at
+# https://shopify.dev/docs/apps/app-extensions/configuration
+
+api_version = "2025-07"
+
+[[extensions]]
+uid = "10db1945-4cfe-187f-f0a3-2fa889bc8a4aa47eaaea"
+type = "ui_extension"
+name = "Bundle Manager"
+handle = "bundle-manager"
+
+[[extensions.targeting]]
+target = "admin.product-details.block.render"
+module = "./src/ActionExtension.tsx"
