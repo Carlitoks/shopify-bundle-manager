@@ -46,6 +46,52 @@ export const GET_INVENTORY_ITEM = `
 `;
 
 /**
+ * Query to get current inventory level
+ */
+export const GET_INVENTORY_LEVEL = `
+  query GetInventoryLevel($inventoryItemId: ID!, $locationId: ID!) {
+    inventoryItem(id: $inventoryItemId) {
+      id
+      inventoryLevel(locationId: $locationId) {
+        id
+        available
+      }
+    }
+  }
+`;
+
+/**
+ * Mutation to set inventory quantity (absolute value)
+ */
+export const SET_INVENTORY = `
+  mutation SetInventory($inventoryItemId: ID!, $locationId: ID!, $quantity: Int!) {
+    inventorySetQuantities(
+      input: {
+        reason: "correction"
+        name: "available"
+        quantities: [{
+          inventoryItemId: $inventoryItemId
+          locationId: $locationId
+          quantity: $quantity
+        }]
+      }
+    ) {
+      inventoryAdjustmentGroup {
+        reason
+        changes {
+          name
+          delta
+        }
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`;
+
+/**
  * Mutation to adjust inventory quantity
  */
 export const ADJUST_INVENTORY = `
@@ -150,6 +196,49 @@ export class ShopifyGraphQL {
     } catch (error) {
       console.error(`[GraphQL] Error fetching inventory item:`, error);
       return null;
+    }
+  }
+
+  /**
+   * Get current inventory level for a product at a location
+   */
+  async getInventoryLevel(inventoryItemId: string, locationId: string): Promise<number | null> {
+    try {
+      const result: any = await this.query(GET_INVENTORY_LEVEL, {
+        inventoryItemId,
+        locationId,
+      });
+
+      const available = result.data?.inventoryItem?.inventoryLevel?.available;
+      return available !== undefined ? available : null;
+    } catch (error) {
+      console.error(`[GraphQL] Error fetching inventory level:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Set inventory to an absolute quantity
+   */
+  async setInventory(inventoryItemId: string, locationId: string, quantity: number): Promise<boolean> {
+    try {
+      const result: any = await this.query(SET_INVENTORY, {
+        inventoryItemId,
+        locationId,
+        quantity,
+      });
+
+      if (result.data?.inventorySetQuantities?.userErrors?.length) {
+        const errors = result.data.inventorySetQuantities.userErrors;
+        console.error(`[GraphQL] Set inventory errors:`, errors);
+        return false;
+      }
+
+      console.log(`[GraphQL] ✓ Inventory set to: ${quantity}`);
+      return true;
+    } catch (error) {
+      console.error(`[GraphQL] Error setting inventory:`, error);
+      return false;
     }
   }
 

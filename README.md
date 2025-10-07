@@ -6,7 +6,10 @@ A Shopify app for creating and managing product bundles with automatic inventory
 
 - **Bundle Creation**: Configure product bundles through the Shopify admin interface
 - **Storefront Display**: Automatically show bundle contents to customers
-- **Inventory Management**: Automatically adjust component inventory when bundles are ordered
+- **Automatic Inventory Sync**:
+  - Bundle inventory = lowest component stock
+  - Component inventory reduces when bundle is ordered
+  - Bundle inventory recalculates automatically
 
 ## Installation
 

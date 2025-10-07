@@ -170,8 +170,57 @@ async function processLineItem(
       }
     }
 
+    // Sync bundle inventory to match lowest component stock
+    await syncBundleInventory(productId, bundleConfig, shop);
+
   } catch (error) {
     console.error(`[Item] ❌ Error processing:`, error);
+  }
+}
+
+/**
+ * Sync bundle inventory = min(component_inventory / component_quantity)
+ */
+async function syncBundleInventory(bundleProductId: string, bundleConfig: BundleConfig, shop: string): Promise<void> {
+  try {
+    console.log(`\n[Sync] → Calculating bundle inventory...`);
+    const client = new ShopifyGraphQL(shop, SHOPIFY_ACCESS_TOKEN);
+
+    const bundleInventoryItemId = await client.getInventoryItemId(bundleProductId);
+    if (!bundleInventoryItemId) {
+      console.log(`[Sync] ⚠ Could not get bundle inventory item ID`);
+      return;
+    }
+
+    const availablePerComponent: number[] = [];
+
+    for (const component of bundleConfig.products) {
+      const inventoryItemId = await client.getInventoryItemId(component.productId);
+      if (!inventoryItemId) continue;
+
+      const currentLevel = await client.getInventoryLevel(inventoryItemId, SHOPIFY_LOCATION_ID);
+      if (currentLevel === null) continue;
+
+      const bundlesAvailable = Math.floor(currentLevel / component.quantity);
+      availablePerComponent.push(bundlesAvailable);
+
+      console.log(`[Sync]   ${component.title}: ${currentLevel} units = ${bundlesAvailable} bundles`);
+    }
+
+    if (availablePerComponent.length === 0) {
+      console.log(`[Sync] ⚠ No component inventory data available`);
+      return;
+    }
+
+    const bundleInventory = Math.min(...availablePerComponent);
+    console.log(`[Sync] → Setting bundle inventory to: ${bundleInventory}`);
+
+    const success = await client.setInventory(bundleInventoryItemId, SHOPIFY_LOCATION_ID, bundleInventory);
+    if (success) {
+      console.log(`[Sync] ✓ Bundle inventory synced: ${bundleInventory}\n`);
+    }
+  } catch (error) {
+    console.error(`[Sync] ❌ Error:`, error);
   }
 }
 
